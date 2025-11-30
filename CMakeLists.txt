@@ -3,9 +3,12 @@ project(em_ds C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_library(em_ds SHARED
-        string.c
-        string.h)
+add_library(em_ds STATIC
+        src/string.c)
 
-add_executable(em_ds_test main.c)
-target_link_libraries(em_ds_test PRIVATE em_ds)
+target_include_directories(em_ds PUBLIC src)
+
+option(EM_DS_BUILD_TESTS "Build test executables" ON)
+if(EM_DS_BUILD_TESTS)
+    add_subdirectory(test)
+endif()

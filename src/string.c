@@ -4,10 +4,10 @@
 
 #include "string.h"
 
+#include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 typedef struct String {
     size_t length;
