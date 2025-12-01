@@ -2,20 +2,14 @@
 // Created by eli on 11/28/25.
 //
 
-#include "string.h"
+#include "em_string.h"
 
-#include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-typedef struct String {
-    size_t length;
-    size_t capacity;
-    char data[];
-} String;
-
-inline String *string_create_buffer(const size_t buffer_size) {
+static String *string_create_buffer(const size_t buffer_size) {
     String *s = malloc(sizeof(String) + buffer_size);
     if (!s) return NULL;
 
@@ -70,19 +64,6 @@ const char *string_cstr(const String *string) {
     return string->data;
 }
 
-void string_print(const String *string) {
-    printf("%s", string->data);
-}
-
-void string_debug_print(const String *string) {
-    for (size_t j = 0; j < 16 && j <= string->capacity; j++) {
-        const unsigned char character = string->data[j];
-        if (character >= 0x20 && character <= 0x7E) printf("%c", character);
-        else if (character == '\0') printf("\\0");
-        else printf(".");
-    }
-}
-
 // --- Modification ---
 int string_append(String *string, const char *suffix);
 
@@ -124,3 +105,23 @@ String *string_substr(const String *string, const size_t start, const size_t len
 }
 
 void string_clear(String *string);
+
+void string_print(const String *string) {
+    printf("%s", string->data);
+}
+
+void string_debug_print(const String *string) {
+    for (size_t j = 0; j < 16 && j <= string->capacity; j++) {
+        const unsigned char character = string->data[j];
+        if (character >= 0x20 && character <= 0x7E) printf("%c", character);
+        else if (character == '\0') printf("\\0");
+        else printf(".");
+    }
+}
+
+void string_build_iterator(Iterator *it, void *obj) {
+    String *string = obj;
+    it->data = string->data;
+    it->length = string->length;
+    it->size = sizeof(char);
+}

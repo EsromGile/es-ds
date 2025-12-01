@@ -7,7 +7,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct String String;
+#include "em_iterator.h"
+
+typedef struct String {
+    size_t length;
+    size_t capacity;
+    char data[];
+} String;
 
 // --- Constructors / Destructors ---
 String *string_create(const char *string);
@@ -22,10 +28,6 @@ void string_destroy(String *string);
 size_t string_length(const String *string);
 
 const char *string_cstr(const String *string);
-
-void string_print(const String *string);
-
-void string_debug_print(const String *string);
 
 // --- Modification ---
 int string_append(String *string, const char *suffix);
@@ -45,5 +47,11 @@ bool string_equals(const String *a, const String *b);
 String *string_substr(const String *string, size_t start, size_t len);
 
 void string_clear(String *string);
+
+void string_print(const String *string);
+
+void string_debug_print(const String *string);
+
+void string_build_iterator(Iterator *it, void *obj);
 
 #endif //EM_DS_STRING_H
