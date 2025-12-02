@@ -27,4 +27,5 @@ void slice_build_iterator(Iterator *it, const void *obj) {
     it->length = slice->length;
     it->data = slice->data + slice->start * slice->type_size;
     it->type_size = slice->type_size;
+    it->pos = 0;
 }

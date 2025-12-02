@@ -9,6 +9,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct String {
+    size_t length;
+    size_t capacity;
+    char data[];
+} String;
+
 static String *string_buffer_create(const size_t buffer_size) {
     String *s = malloc(sizeof(String) + buffer_size);
     if (!s) return NULL;
@@ -18,21 +24,26 @@ static String *string_buffer_create(const size_t buffer_size) {
     return s;
 }
 
+static void string_buffer_populate(String *src, const char *dest, const size_t length) {
+    memcpy(src->data, dest, length);
+    src->data[length - 1] = '\0';
+    src->length = src->capacity;
+}
+
 // --- Constructors / Destructors ---
 String *string_create(const char *string) {
     const size_t length = strlen(string) + 1;
     String *s = string_buffer_create(length);
     if (!s) return NULL;
 
-    memcpy(s->data, string, length);
-    s->data[length - 1] = '\0';
-    s->length = s->capacity;
+    string_buffer_populate(s, string, length);
     return s;
 }
 
 String *string_empty() {
     String *s = string_buffer_create(16);
     if (!s) return NULL;
+
     s->data[0] = '\0';
     return s;
 }
@@ -42,9 +53,7 @@ String *string_copy(const String *string) {
     String *s = string_buffer_create(length);
     if (!s) return NULL;
 
-    memcpy(s->data, string->data, length);
-    s->data[length] = '\0';
-    s->length = s->capacity;
+    string_buffer_populate(s, string->data, length);
     return s;
 }
 
@@ -97,13 +106,17 @@ String *string_substr(const String *string, const size_t start, const size_t len
     if (!string || start + len > string->length) return NULL;
     String *s = string_buffer_create(len + 1);
     if (!s) return NULL;
-    memcpy(s->data, string->data + start, len);
-    s->data[len] = '\0';
-    s->length = s->capacity;
+
+    string_buffer_populate(s, string->data + start, len);
     return s;
 }
 
-void string_clear(String *string);
+void string_clear(String *string) {
+    if (!string) return;
+    memset(string->data, 0, string->capacity);
+    string->data[0] = '\0';
+    string->length = 0;
+}
 
 void string_print(const String *string) {
     printf("%s", string->data);

@@ -10,11 +10,7 @@
 #include "em_iterator.h"
 #include "em_slice.h"
 
-typedef struct String {
-    size_t length;
-    size_t capacity;
-    char data[];
-} String;
+typedef struct String String;
 
 // --- Constructors / Destructors ---
 String *string_create(const char *string);
