@@ -10,14 +10,12 @@
 Iterator *iterator_create(void *obj, const iterator_func builder) {
     Iterator *it = malloc(sizeof(Iterator));
     if (!it) return NULL;
-
     iterator_init(it, obj, builder);
     return it;
 }
 
 void iterator_init(Iterator *it, void *obj, const iterator_func builder) {
     if (!it || !obj) return;
-
     builder(it, obj);
     it->pos = 0;
 }
