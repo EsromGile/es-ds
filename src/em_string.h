@@ -52,6 +52,6 @@ void string_print(const String *string);
 
 void string_debug_print(const String *string);
 
-void string_build_iterator(Iterator *it, void *obj);
+void string_build_iterator(Iterator *it, const void *obj);
 
 #endif //EM_DS_STRING_H

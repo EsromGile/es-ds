@@ -25,7 +25,7 @@ String *string_create(const char *string) {
     if (!s) return NULL;
 
     memcpy(s->data, string, length);
-    s->data[length] = '\0';
+    s->data[length - 1] = '\0';
     s->length = s->capacity;
     return s;
 }
@@ -119,8 +119,8 @@ void string_debug_print(const String *string) {
     }
 }
 
-void string_build_iterator(Iterator *it, void *obj) {
-    String *string = obj;
+void string_build_iterator(Iterator *it, const void *obj) {
+    const String *string = obj;
     it->data = string->data;
     it->length = string->length;
     it->size = sizeof(char);

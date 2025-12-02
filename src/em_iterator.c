@@ -7,17 +7,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-Iterator *iterator_create(void *obj, const iterator_func builder) {
-    Iterator *it = malloc(sizeof(Iterator));
-    if (!it) return NULL;
-    iterator_init(it, obj, builder);
+Iterator iterator_create(void *obj, const iterator_callback builder) {
+    Iterator it;
+    builder(&it, obj);
+    it.pos = 0;
     return it;
-}
-
-void iterator_init(Iterator *it, void *obj, const iterator_func builder) {
-    if (!it || !obj) return;
-    builder(it, obj);
-    it->pos = 0;
 }
 
 void *iterator_next(Iterator *it) {
