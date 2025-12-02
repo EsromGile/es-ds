@@ -13,20 +13,33 @@ int main(void) {
     string_debug_print(string);
     printf("\n");
 
-    Iterator it2 = iterator_create(string, string_build_iterator);
+    Slice slice1 = slice_make(string, string_build_slice, 2, 3);
+    Iterator it3 = iterator_make(&slice1, slice_build_iterator);
+    printf(">>> SLICE:{\n");
+    for (const char *value = iterator_next(&it3); value != NULL; value = iterator_next(&it3)) {
+        printf("%c", *value);
+    }
+    printf("\n}\n");
+
+    Iterator it2 = iterator_make(string, string_build_iterator);
+    printf(">>> ITERATOR:{\n");
     for (const char *value = iterator_next(&it2); value != NULL; value = iterator_next(&it2)) {
         printf("%c", *value);
     }
-    printf("\n");
+    printf("\n}\n");
 
     // String *substring = string_substr(string, 2, 3);
     // string_debug_print(substring);
     // printf("\n");
 
-    const int values[] = { 0, 1, 2, 3, 4, 5, 6 };
-    Slice slice = slice_create(&values, sizeof(int), 2, 3);
+    const int values[] = {0, 1, 2, 3, 4, 5, 6};
+    Slice slice = slice_generic_make(&values, sizeof(int), 2, 3);
+    Iterator it4 = iterator_make(&slice, slice_build_iterator);
+    for (const int *value = iterator_next(&it4); value != NULL; value = iterator_next(&it4)) {
+        printf("%d", *value);
+    }
 
-    Iterator it = iterator_create(&slice, slice_build_iterator);
+    Iterator it = iterator_generic_make(values, sizeof(int), sizeof(values) / sizeof(int));
     for (const int *value = iterator_next(&it); value != NULL; value = iterator_next(&it)) {
         printf("%d", *value);
     }

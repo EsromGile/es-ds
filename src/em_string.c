@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static String *string_create_buffer(const size_t buffer_size) {
+static String *string_buffer_create(const size_t buffer_size) {
     String *s = malloc(sizeof(String) + buffer_size);
     if (!s) return NULL;
 
@@ -21,7 +21,7 @@ static String *string_create_buffer(const size_t buffer_size) {
 // --- Constructors / Destructors ---
 String *string_create(const char *string) {
     const size_t length = strlen(string) + 1;
-    String *s = string_create_buffer(length);
+    String *s = string_buffer_create(length);
     if (!s) return NULL;
 
     memcpy(s->data, string, length);
@@ -31,7 +31,7 @@ String *string_create(const char *string) {
 }
 
 String *string_empty() {
-    String *s = string_create_buffer(16);
+    String *s = string_buffer_create(16);
     if (!s) return NULL;
     s->data[0] = '\0';
     return s;
@@ -39,7 +39,7 @@ String *string_empty() {
 
 String *string_copy(const String *string) {
     const size_t length = string->length + 1;
-    String *s = string_create_buffer(length);
+    String *s = string_buffer_create(length);
     if (!s) return NULL;
 
     memcpy(s->data, string->data, length);
@@ -95,8 +95,7 @@ bool string_equals(const String *a, const String *b) {
 // --- Utility ---
 String *string_substr(const String *string, const size_t start, const size_t len) {
     if (!string || start + len > string->length) return NULL;
-
-    String *s = string_create_buffer(len + 1);
+    String *s = string_buffer_create(len + 1);
     if (!s) return NULL;
     memcpy(s->data, string->data + start, len);
     s->data[len] = '\0';
@@ -119,9 +118,16 @@ void string_debug_print(const String *string) {
     }
 }
 
+// --- Builders ---
 void string_build_iterator(Iterator *it, const void *obj) {
     const String *string = obj;
     it->data = string->data;
     it->length = string->length;
-    it->size = sizeof(char);
+    it->type_size = sizeof(char);
+}
+
+void string_build_slice(Slice *slice, const void *obj) {
+    const String *string = obj;
+    slice->data = string->data;
+    slice->type_size = sizeof(char);
 }

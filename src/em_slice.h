@@ -5,21 +5,20 @@
 #ifndef EM_DS_EM_SLICE_H
 #define EM_DS_EM_SLICE_H
 
-#include <stdint.h>
-
 #include "em_iterator.h"
 
 typedef struct Slice {
-    const uint8_t *data;
+    const void *data;
     size_t start;
     size_t length;
     size_t type_size;
 } Slice;
 
-Slice slice_create(const void *data, size_t type_size, size_t start, size_t length);
+typedef void (*slice_callback)(Slice *slice, const void *data);
 
-// We aren't freeing object since we don't own the memory
-void slice_destroy(Slice *slice);
+Slice slice_generic_make(const void *data, size_t type_size, size_t start, size_t length);
+
+Slice slice_make(const void *obj, slice_callback builder, size_t start, size_t length);
 
 void slice_build_iterator(Iterator *it, const void *obj);
 
