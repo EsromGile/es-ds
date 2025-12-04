@@ -7,9 +7,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "em_iterator.h"
-#include "em_slice.h"
-
 typedef struct String {
     size_t length;
     size_t capacity;
@@ -31,13 +28,10 @@ size_t string_length(const String *string);
 const char *string_cstr(const String *string);
 
 // --- Modification ---
-int string_append(String *string, const char *suffix);
 
-int string_concat(String *dest, const String *src);
+void string_concat(String *dest, const String *src);
 
-int string_insert(String *string, size_t pos, const char *substring);
-
-int string_resize(String *string, size_t new_capacity);
+void string_insert(String *string, size_t pos, const char *substring);
 
 // --- Comparison ---
 int string_compare(const String *a, const String *b);

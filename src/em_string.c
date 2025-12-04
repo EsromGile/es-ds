@@ -68,13 +68,9 @@ const char *string_cstr(const String *string) {
 }
 
 // --- Modification ---
-int string_append(String *string, const char *suffix);
+void string_concat(String *dest, const String *src);
 
-int string_concat(String *dest, const String *src);
-
-int string_insert(String *string, size_t pos, const char *substring);
-
-int string_resize(String *string, size_t new_capacity);
+void string_insert(String *string, size_t pos, const char *substring);
 
 // --- Comparison ---
 int string_compare(const String *a, const String *b) {
@@ -123,18 +119,4 @@ void string_debug_print(const String *string) {
         else if (character == '\0') printf("\\0");
         else printf(".");
     }
-}
-
-// --- Builders ---
-void string_build_iterator(Iterator *it, const void *obj) {
-    const String *string = obj;
-    it->data = string->data;
-    it->length = string->length;
-    it->type_size = sizeof(char);
-}
-
-void string_build_slice(Slice *slice, const void *obj) {
-    const String *string = obj;
-    slice->data = string->data;
-    slice->type_size = sizeof(char);
 }
