@@ -10,7 +10,11 @@
 #include "em_iterator.h"
 #include "em_slice.h"
 
-typedef struct String String;
+typedef struct String {
+    size_t length;
+    size_t capacity;
+    char data[];
+} String;
 
 // --- Constructors / Destructors ---
 String *string_create(const char *string);
@@ -48,10 +52,5 @@ void string_clear(String *string);
 void string_print(const String *string);
 
 void string_debug_print(const String *string);
-
-// --- Builders ---
-void string_build_iterator(Iterator *it, const void *obj);
-
-void string_build_slice(Slice *slice, const void *obj);
 
 #endif //EM_DS_STRING_H

@@ -9,12 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct String {
-    size_t length;
-    size_t capacity;
-    char data[];
-} String;
-
 static String *string_buffer_create(const size_t buffer_size) {
     String *s = malloc(sizeof(String) + buffer_size);
     if (!s) return NULL;
