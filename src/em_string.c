@@ -12,23 +12,45 @@
 typedef struct String {
     size_t length;
     size_t capacity;
-    char data[];
+    char *data;
 } String;
 
-static String *string_buffer_create(const size_t buffer_size) {
-    String *s = malloc(sizeof(String) + buffer_size);
+/* ===== TODOS =====
+ * - add error logging
+ * - add smart memory capacity scaling
+ */
+
+static String *string_buffer_create(const size_t alloc_size) {
+    String *s = malloc(sizeof(String));
     if (!s) return NULL;
 
-    s->capacity = buffer_size - 1;
+    s->data = malloc(alloc_size);
+    if (!s->data) {
+        free(s);
+        return NULL;
+    }
+
+    s->capacity = alloc_size - 1;
     s->length = 0;
+    s->data[0] = '\0';
     return s;
 }
 
-static void string_buffer_populate(String *src, const char *dest, const size_t length) {
-    memcpy(src->data, dest, length);
-    src->data[length - 1] = '\0';
-    src->length = length - 1;
+static void string_buffer_populate(String *self, const char *string, const size_t length) {
+    memcpy(self->data, string, length);
+    self->data[length - 1] = '\0';
+    self->length = length - 1;
 }
+
+static bool string_resize_memory(String *self, size_t new_capacity) {
+    if (self->capacity >= new_capacity) return true;
+    char *new_data = realloc(self->data, new_capacity + 1);
+    if (!new_data) return false;
+    self->data = new_data;
+    self->capacity = new_capacity;
+    return true;
+}
+
 
 // --- Constructors / Destructors ---
 String *string_create(const char *string) {
@@ -48,34 +70,54 @@ String *string_empty() {
     return s;
 }
 
-String *string_copy(const String *string) {
-    const size_t length = string->length + 1;
+String *string_copy(const String *self) {
+    const size_t length = self->length + 1;
     String *s = string_buffer_create(length);
     if (!s) return NULL;
 
-    string_buffer_populate(s, string->data, length);
+    string_buffer_populate(s, self->data, length);
     return s;
 }
 
-void string_destroy(String *string) {
-    if (!string) return;
-    free(string);
+void string_destroy(String *self) {
+    if (!self) return;
+    free(self->data);
+    free(self);
 }
 
 // --- Basic Operations ---
-size_t string_length(const String *string) {
-    return string ? string->length : 0;
+size_t string_length(const String *self) {
+    return self ? self->length : 0;
 }
 
-const char *string_cstr(const String *string) {
-    if (!string) return NULL;
-    return string->data;
+const char *string_cstr(const String *self) {
+    if (!self) return NULL;
+    return self->data;
 }
 
 // --- Modification ---
-void string_concat(String *dest, const String *src);
+void string_concat(String *self, const char *suffix) {
+    if (!suffix) return;
+    const size_t suffix_len = strlen(suffix);
+    const size_t new_length = self->length + suffix_len;
+    if (!string_resize_memory(self, new_length)) return;
+    memcpy(self->data + self->length, suffix, suffix_len);
+    self->data[new_length] = '\0';
+    self->length = new_length;
+}
 
-void string_insert(String *string, size_t pos, const char *substring);
+void string_insert(String *self, const size_t pos, const char *substring) {
+    if (!substring) return;
+    if (pos == self->length) return string_concat(self, substring);
+    if (pos > self->length) return;
+    const size_t new_length = self->length + strlen(substring);
+    const size_t substring_length = strlen(substring);
+    if (!string_resize_memory(self, new_length)) return;
+    memmove(self->data + pos + substring_length, self->data + pos, self->length - pos + 1);
+    memcpy(self->data + pos, substring, substring_length);
+    self->data[new_length] = '\0';
+    self->length = new_length;
+}
 
 // --- Comparison ---
 int string_compare(const String *a, const String *b) {
@@ -90,32 +132,38 @@ bool string_equals(const String *a, const String *b) {
 }
 
 // --- Utility ---
-String *string_substr(const String *string, const size_t start, const size_t len) {
-    const size_t substr_len = len + 1; // Accounting for missing \0 character
-    if (!string || start + len > string->length) return NULL;
-    String *s = string_buffer_create(substr_len);
+String *string_substr(const String *self, const size_t start, const size_t length) {
+    if (!self || start + length > self->length) return NULL;
+    String *s = string_buffer_create(length + 1);
     if (!s) return NULL;
 
-    string_buffer_populate(s, string->data + start, substr_len);
+    memcpy(s->data, self->data + start, length);
+    s->data[length] = '\0';
+    s->length = length;
     return s;
 }
 
-void string_clear(String *string) {
-    if (!string) return;
-    memset(string->data, 0, string->capacity + 1);
-    string->data[0] = '\0';
-    string->length = 0;
+void string_clear(String *self) {
+    if (!self) return;
+    memset(self->data, 0, self->capacity + 1);
+    self->data[0] = '\0';
+    self->length = 0;
 }
 
-void string_print(const String *string) {
-    printf("%s", string->data);
-}
-
-void string_debug_print(const String *string) {
-    for (size_t j = 0; j < 16 && j <= string->capacity; j++) {
-        const unsigned char character = string->data[j];
-        if (character >= 0x20 && character <= 0x7E) printf("%c", character);
-        else if (character == '\0') printf("\\0");
-        else printf(".");
+void string_debug_print(const String *self) {
+    printf("\n===== STRING =====\n");
+    printf("Capacity: %zu\n", self->capacity);
+    printf("Length: %zu\n", self->length);
+    printf("Contents: {\n");
+    for (size_t i = 0; i < self->length / 16 + 1; i++) {
+        printf("  ");
+        for (size_t j = 0; j < 16 && j < self->capacity + 1; j++) {
+            const unsigned char character = self->data[i * 16 + j];
+            if (character >= 0x20 && character <= 0x7E) printf("%c", character);
+            else printf(".");
+        }
+        printf("\n");
     }
+    printf("}\n");
+    printf("==================\n");
 }

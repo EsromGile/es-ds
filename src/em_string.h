@@ -15,20 +15,20 @@ String *string_create(const char *string);
 
 String *string_empty();
 
-String *string_copy(const String *string);
+String *string_copy(const String *self);
 
-void string_destroy(String *string);
+void string_destroy(String *self);
 
 // --- Basic Operations ---
-size_t string_length(const String *string);
+size_t string_length(const String *self);
 
-const char *string_cstr(const String *string);
+const char *string_cstr(const String *self);
 
 // --- Modification ---
 
-void string_concat(String *dest, const String *src);
+void string_concat(String *self, const char *suffix);
 
-void string_insert(String *string, size_t pos, const char *substring);
+void string_insert(String *self, size_t pos, const char *substring);
 
 // --- Comparison ---
 int string_compare(const String *a, const String *b);
@@ -36,12 +36,10 @@ int string_compare(const String *a, const String *b);
 bool string_equals(const String *a, const String *b);
 
 // --- Utility ---
-String *string_substr(const String *string, size_t start, size_t len);
+String *string_substr(const String *self, size_t start, size_t length);
 
-void string_clear(String *string);
+void string_clear(String *self);
 
-void string_print(const String *string);
-
-void string_debug_print(const String *string);
+void string_debug_print(const String *self);
 
 #endif //EM_DS_STRING_H
