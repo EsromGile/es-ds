@@ -4,14 +4,11 @@
 
 #ifndef EM_DS_STRING_H
 #define EM_DS_STRING_H
+
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct String {
-    size_t length;
-    size_t capacity;
-    char data[];
-} String;
+typedef struct String String;
 
 // --- Constructors / Destructors ---
 String *string_create(const char *string);

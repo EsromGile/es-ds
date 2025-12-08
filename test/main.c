@@ -13,7 +13,7 @@ int main(void) {
     string_debug_print(string);
     printf("\n");
 
-    const Slice slice1 = slice_make(string->data, sizeof(char), 2, 3);
+    const Slice slice1 = slice_make(string_cstr(string), sizeof(char), 2, 3);
     const char *s = slice_get(&slice1, 0);
     printf("%c\n", *s);
 
@@ -24,7 +24,7 @@ int main(void) {
     }
     printf("\n}\n");
 
-    Iterator it2 = iterator_make(string->data, sizeof(char), string->length, 0);
+    Iterator it2 = iterator_make(string_cstr(string), sizeof(char), string_length(string), 0);
     printf(">>> ITERATOR:{\n");
     for (const char *value = iterator_next(&it2); value != NULL; value = iterator_next(&it2)) {
         printf("%c", *value);

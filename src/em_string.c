@@ -9,6 +9,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct String {
+    size_t length;
+    size_t capacity;
+    char data[];
+} String;
+
 static String *string_buffer_create(const size_t buffer_size) {
     String *s = malloc(sizeof(String) + buffer_size);
     if (!s) return NULL;
@@ -21,7 +27,7 @@ static String *string_buffer_create(const size_t buffer_size) {
 static void string_buffer_populate(String *src, const char *dest, const size_t length) {
     memcpy(src->data, dest, length);
     src->data[length - 1] = '\0';
-    src->length = src->capacity;
+    src->length = length - 1;
 }
 
 // --- Constructors / Destructors ---
@@ -58,8 +64,7 @@ void string_destroy(String *string) {
 
 // --- Basic Operations ---
 size_t string_length(const String *string) {
-    if (!string) return 0;
-    return string->length;
+    return string ? string->length : 0;
 }
 
 const char *string_cstr(const String *string) {
@@ -75,16 +80,9 @@ void string_insert(String *string, size_t pos, const char *substring);
 // --- Comparison ---
 int string_compare(const String *a, const String *b) {
     if (!a && !b) return 0;
-    if (!b) return 1;
     if (!a) return -1;
-    if (a->length > b->length) return 1;
-    if (a->length < b->length) return -1;
-
-    for (size_t i = 0; i < a->length; i++) {
-        if (a->data[i] > b->data[i]) return 1;
-        if (a->data[i] < b->data[i]) return -1;
-    }
-    return 0;
+    if (!b) return 1;
+    return strcmp(a->data, b->data);
 }
 
 bool string_equals(const String *a, const String *b) {
@@ -93,17 +91,18 @@ bool string_equals(const String *a, const String *b) {
 
 // --- Utility ---
 String *string_substr(const String *string, const size_t start, const size_t len) {
+    const size_t substr_len = len + 1; // Accounting for missing \0 character
     if (!string || start + len > string->length) return NULL;
-    String *s = string_buffer_create(len + 1);
+    String *s = string_buffer_create(substr_len);
     if (!s) return NULL;
 
-    string_buffer_populate(s, string->data + start, len);
+    string_buffer_populate(s, string->data + start, substr_len);
     return s;
 }
 
 void string_clear(String *string) {
     if (!string) return;
-    memset(string->data, 0, string->capacity);
+    memset(string->data, 0, string->capacity + 1);
     string->data[0] = '\0';
     string->length = 0;
 }
