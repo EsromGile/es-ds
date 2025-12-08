@@ -8,7 +8,7 @@ add_library(em_ds STATIC
         src/em_slice.c
         src/em_iterator.c)
 
-target_include_directories(em_ds PUBLIC src)
+target_include_directories(em_ds PUBLIC src include)
 
 option(EM_DS_BUILD_TESTS "Build test executables" ON)
 if(EM_DS_BUILD_TESTS)

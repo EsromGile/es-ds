@@ -3,6 +3,7 @@
 //
 
 #include "em_string.h"
+#include "em_mem_print.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -165,15 +166,7 @@ void string_debug_print(const String *self) {
     printf("Capacity: %zu\n", self->capacity);
     printf("Length: %zu\n", self->length);
     printf("Contents: {\n");
-    for (size_t i = 0; i < self->length / 16 + 1; i++) {
-        printf("  ");
-        for (size_t j = 0; j < 16 && j < self->capacity + 1; j++) {
-            const unsigned char character = self->data[i * 16 + j];
-            if (character >= 0x20 && character <= 0x7E) printf("%c", character);
-            else printf(".");
-        }
-        printf("\n");
-    }
+    mem_print_bytes((uint8_t *)self->data, self->capacity + 1, 16);
     printf("}\n");
     printf("==================\n");
 }
