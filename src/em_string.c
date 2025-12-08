@@ -20,10 +20,15 @@ typedef struct String {
  * - add smart memory capacity scaling
  */
 
-static String *string_buffer_create(const size_t alloc_size) {
+static size_t string_alloc_round(const size_t min_capacity) {
+    return (min_capacity / 16 + 1) * 16;
+}
+
+static String *string_buffer_create(const size_t min_capacity) {
     String *s = malloc(sizeof(String));
     if (!s) return NULL;
 
+    const size_t alloc_size = string_alloc_round(min_capacity);
     s->data = malloc(alloc_size);
     if (!s->data) {
         free(s);
@@ -42,15 +47,20 @@ static void string_buffer_populate(String *self, const char *string, const size_
     self->length = length - 1;
 }
 
-static bool string_resize_memory(String *self, size_t new_capacity) {
-    if (self->capacity >= new_capacity) return true;
-    char *new_data = realloc(self->data, new_capacity + 1);
+static bool string_resize_memory(String *self, const size_t min_capacity) {
+    if (self->capacity >= min_capacity) return true;
+
+    size_t alloc_size = self->capacity;
+    while (alloc_size < min_capacity) {
+        alloc_size = string_alloc_round((size_t) ((double) alloc_size * 1.5));
+    }
+
+    char *new_data = realloc(self->data, alloc_size);
     if (!new_data) return false;
     self->data = new_data;
-    self->capacity = new_capacity;
+    self->capacity = alloc_size - 1;
     return true;
 }
-
 
 // --- Constructors / Destructors ---
 String *string_create(const char *string) {

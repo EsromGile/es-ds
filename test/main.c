@@ -12,9 +12,11 @@ int main(void) {
     String *string = string_create("Hello World");
     string_debug_print(string);
 
+    printf("INSERT");
     string_insert(string, 5, "-elloello");
     string_debug_print(string);
 
+    printf("CONCAT");
     string_concat(string, "#EIEIO");
     string_debug_print(string);
 
