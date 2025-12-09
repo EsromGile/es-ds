@@ -176,7 +176,7 @@ void string_insert(String *self, const size_t pos, const char *substring) {
         return;
     }
     if (pos > self->length) {
-        errno = EOVERFLOW;
+        errno = ERANGE;
         return;
     }
 
@@ -223,7 +223,7 @@ String *string_substr(const String *self, const size_t start, const size_t lengt
     }
 
     if (start > self->length || length > self->length - start) {
-        errno = EOVERFLOW;
+        errno = ERANGE;
         return NULL;
     }
 
@@ -252,6 +252,7 @@ void string_debug_print(const String *self) {
     printf("\n===== STRING =====\n");
     if (!self) {
         errno = EFAULT;
+        printf("Empty String");
     } else {
         printf("Capacity: %zu\n", self->capacity);
         printf("Length: %zu\n", self->length);

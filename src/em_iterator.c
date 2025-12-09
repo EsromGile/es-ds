@@ -4,17 +4,35 @@
 
 #include "em_iterator.h"
 
+#include <errno.h>
+
 Iterator iterator_make(const void *obj, const size_t type_size, const size_t length, const uint64_t pos) {
     Iterator it;
-    it.pos = !pos ? 0 : pos;
-    it.length = !pos ? length : pos + length;
     it.type_size = type_size;
-    it.data = obj;
+    if (!obj) {
+        errno = EFAULT;
+        it.pos = 0;
+        it.length = 0;
+        it.data = NULL;
+    } else {
+        it.pos = pos;
+        it.length = pos == 0 ? length : pos + length;
+        it.data = obj;
+    }
     return it;
 }
 
 void *iterator_next(Iterator *it) {
-    if (!it || it->pos < 0 || it->pos >= it->length) return NULL;
+    if (!it || !it->data) {
+        errno = EFAULT;
+        return NULL;
+    }
+
+    if (it->pos < 0 || it->pos >= it->length) {
+        errno = ERANGE;
+        return NULL;
+    }
+
     void *data = (uint8_t *) it->data + it->pos * it->type_size;
     it->pos++;
     return data;
