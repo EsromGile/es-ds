@@ -13,6 +13,8 @@ typedef struct String String;
 // --- Constructors / Destructors ---
 String *string_create(const char *string);
 
+String *string_own_create(char *string);
+
 String *string_empty();
 
 String *string_copy(const String *self);

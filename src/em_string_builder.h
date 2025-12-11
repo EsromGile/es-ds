@@ -13,6 +13,8 @@ void string_builder_destroy(StringBuilder *builder);
 
 void string_builder_add(StringBuilder *self, const char *string);
 
-const char *string_builder_build(StringBuilder *self);
+void string_builder_multi_add(StringBuilder *self, const char *first, ...);
+
+char *string_builder_build(StringBuilder *self);
 
 #endif //EM_DS_EM_STRING_BUILDER_H

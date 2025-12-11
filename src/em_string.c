@@ -88,6 +88,18 @@ String *string_create(const char *string) {
     return s;
 }
 
+String *string_own_create(char *string) {
+    String *s = malloc(sizeof(String));
+    if (!s) {
+        errno = ENOMEM;
+        return NULL;
+    }
+
+    s->data = string;
+    s->length = s->capacity = strlen(string);
+    return s;
+}
+
 String *string_empty() {
     String *s = string_buffer_create(16);
     if (!s) {

@@ -5,11 +5,16 @@
 
 #include <stdlib.h>
 #include <errno.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "em_arena.h"
 
-#define MAX_STRING_BUILDER_SIZE 1024;
+#define STRING_BUILDER_MAX_CAPACITY 2048
+#define STRING_BUILDER_ARENA_CAPACITY 64
+#define STRING_BUILDER_INITIAL_CAPACITY 16
 
 typedef struct StringBuilder {
     size_t count;
@@ -19,8 +24,7 @@ typedef struct StringBuilder {
     char **ptrs;
 } StringBuilder;
 
-static inline const char* string_builder_populate(const StringBuilder *self) {
-    char *string = malloc(sizeof(char) * self->length + 1);
+static inline const char* string_builder_populate(const StringBuilder *self, char *string) {
     uint64_t cumulative_length = 0;
     for (uint64_t i = 0; i < self->count; i++) {
         const uint64_t len = strlen(self->ptrs[i]);
@@ -41,7 +45,7 @@ static inline void string_builder_reset(StringBuilder *self) {
 
 StringBuilder *string_builder_create() {
     StringBuilder *builder = malloc(sizeof(StringBuilder));
-    builder->capacity = 16;
+    builder->capacity = STRING_BUILDER_INITIAL_CAPACITY;
     if (!builder) {
         errno = ENOMEM;
         return NULL;
@@ -53,7 +57,7 @@ StringBuilder *string_builder_create() {
         return NULL;
     }
 
-    builder->arena = arena_create(0);
+    builder->arena = arena_create(STRING_BUILDER_ARENA_CAPACITY);
     if (!builder->arena) {
         errno = ENOMEM;
         free(builder->ptrs);
@@ -78,14 +82,40 @@ void string_builder_add(StringBuilder *self, const char *string) {
         return;
     }
 
-    // TODO: scale up ptrs if too small
+    if (self->count == self->capacity && self->capacity != STRING_BUILDER_MAX_CAPACITY) {
+        const uint64_t new_capacity = self->capacity * 2;
+        char **new_ptrs = realloc(self->ptrs, sizeof(char *) * new_capacity);
+        if (!new_ptrs) {
+            errno = ENOMEM;
+            return;
+        }
+        self->ptrs = new_ptrs;
+        self->capacity = new_capacity;
+    } else if (self->capacity == STRING_BUILDER_MAX_CAPACITY) {
+        errno = EPERM;
+        return;
+    }
 
     char *cpy = arena_strdup(self->arena, string);
     self->ptrs[self->count++] = cpy;
     self->length += strlen(cpy);
 }
 
-const char *string_builder_build(StringBuilder *self) {
+// TODO: figure out why this goes over bounds
+void string_builder_multi_add(StringBuilder *self, const char *first, ...) {
+    va_list args;
+    va_start(args, first);
+
+    const char *str = first;
+    while (str != NULL) {
+        string_builder_add(self, str);
+        str = va_arg(args, const char *);
+    }
+
+    va_end(args);
+}
+
+char *string_builder_build(StringBuilder *self) {
     if (!self) {
         errno = EFAULT;
         return NULL;
@@ -96,9 +126,14 @@ const char *string_builder_build(StringBuilder *self) {
         return NULL;
     }
 
-    const char *string = string_builder_populate(self);
-    string_builder_reset(self);
+    char *string = malloc(sizeof(char) * self->length + 1);
+    if (!string) {
+        errno = ENOMEM;
+        return NULL;
+    }
 
+    string_builder_populate(self, string);
+    string_builder_reset(self);
 
     return string;
 }

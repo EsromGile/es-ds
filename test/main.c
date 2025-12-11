@@ -3,6 +3,7 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "em_iterator.h"
 #include "em_slice.h"
@@ -26,12 +27,11 @@ int main(void) {
     // string_destroy(substr);
 
     StringBuilder *builder = string_builder_create();
-    string_builder_add(builder, "hello");
-    string_builder_add(builder, " ");
-    string_builder_add(builder, "world");
-    string_builder_add(builder, "!");
-    const char *str = string_builder_build(builder);
-    printf("%s\n", str);
+    string_builder_multi_add(builder, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15");
+    String *str = string_own_create(string_builder_build(builder));
+    printf("%s\n", string_cstr(str));
+    string_destroy(str);
+    string_builder_destroy(builder);
 
     // const Slice slice1 = slice_make(string_cstr(string), sizeof(char), 2, 3);
     // const char *s = slice_get(&slice1, 0);
