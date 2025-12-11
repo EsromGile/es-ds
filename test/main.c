@@ -7,22 +7,31 @@
 #include "em_iterator.h"
 #include "em_slice.h"
 #include "em_string.h"
+#include "em_string_builder.h"
 
 int main(void) {
-    String *string = string_create("Hello World");
-    string_debug_print(string);
+    // String *string = string_create("Hello World");
+    // string_debug_print(string);
+    //
+    // printf("INSERT");
+    // string_insert(string, 5, "-elloello");
+    // string_debug_print(string);
+    //
+    // printf("CONCAT");
+    // string_concat(string, "#EIEIO");
+    // string_debug_print(string);
+    //
+    // String *substr = string_substr(string, 6, 10);
+    // string_debug_print(substr);
+    // string_destroy(substr);
 
-    printf("INSERT");
-    string_insert(string, 5, "-elloello");
-    string_debug_print(string);
-
-    printf("CONCAT");
-    string_concat(string, "#EIEIO");
-    string_debug_print(string);
-
-    String *substr = string_substr(string, 6, 10);
-    string_debug_print(substr);
-    string_destroy(substr);
+    StringBuilder *builder = string_builder_create();
+    string_builder_add(builder, "hello");
+    string_builder_add(builder, " ");
+    string_builder_add(builder, "world");
+    string_builder_add(builder, "!");
+    const char *str = string_builder_build(builder);
+    printf("%s\n", str);
 
     // const Slice slice1 = slice_make(string_cstr(string), sizeof(char), 2, 3);
     // const char *s = slice_get(&slice1, 0);
@@ -58,6 +67,6 @@ int main(void) {
     //     printf("%d", *value);
     // }
 
-    string_destroy(string);
+    // string_destroy(string);
     return 0;
 }
