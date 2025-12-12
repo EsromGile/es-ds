@@ -13,7 +13,7 @@ void string_builder_destroy(StringBuilder *builder);
 
 void string_builder_add(StringBuilder *self, const char *string);
 
-void string_builder_multi_add(StringBuilder *self, const char *first, ...);
+void string_builder_multi_add(StringBuilder *self, int count, ...);
 
 char *string_builder_build(StringBuilder *self);
 

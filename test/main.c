@@ -27,7 +27,7 @@ int main(void) {
     // string_destroy(substr);
 
     StringBuilder *builder = string_builder_create();
-    string_builder_multi_add(builder, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15");
+    string_builder_multi_add(builder, 16, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15");
     String *str = string_own_create(string_builder_build(builder));
     printf("%s\n", string_cstr(str));
     string_destroy(str);

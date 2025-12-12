@@ -101,15 +101,13 @@ void string_builder_add(StringBuilder *self, const char *string) {
     self->length += strlen(cpy);
 }
 
-// TODO: figure out why this goes over bounds
-void string_builder_multi_add(StringBuilder *self, const char *first, ...) {
+void string_builder_multi_add(StringBuilder *self, const int count, ...) {
     va_list args;
-    va_start(args, first);
+    va_start(args, count);
 
-    const char *str = first;
-    while (str != NULL) {
-        string_builder_add(self, str);
-        str = va_arg(args, const char *);
+    for (int i = 0; i < count; i++) {
+        const char *string = va_arg(args, char *);
+        string_builder_add(self, string);
     }
 
     va_end(args);
