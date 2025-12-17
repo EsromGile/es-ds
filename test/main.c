@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "em_hash.h"
 #include "em_iterator.h"
 #include "em_slice.h"
 #include "em_string.h"
@@ -26,12 +27,19 @@ int main(void) {
     // string_debug_print(substr);
     // string_destroy(substr);
 
-    StringBuilder *builder = string_builder_create();
-    string_builder_multi_add(builder, 16, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15");
-    String *str = string_own_create(string_builder_build(builder));
-    printf("%s\n", string_cstr(str));
-    string_destroy(str);
-    string_builder_destroy(builder);
+    // StringBuilder *builder = string_builder_create();
+    // string_builder_multi_add(builder, 16, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15");
+    // String *str = string_own_create(string_builder_build(builder));
+    // printf("%s\n", string_cstr(str));
+    // string_destroy(str);
+    // string_builder_destroy(builder);
+
+    HashTable *hash_table = hash_table_create(0, sizeof(uint32_t));
+    uint32_t value = 32;
+    hash_table_add(hash_table, &value);
+    bool x = hash_table_contains_value(hash_table, &value);
+    printf("Contains: %d\n", x);
+
 
     // const Slice slice1 = slice_make(string_cstr(string), sizeof(char), 2, 3);
     // const char *s = slice_get(&slice1, 0);
