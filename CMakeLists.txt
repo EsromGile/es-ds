@@ -8,7 +8,11 @@ add_library(em_ds STATIC
         src/em_slice.c
         src/em_iterator.c
         src/em_string_builder.c
-        src/em_hash.c)
+        src/em_hash.c
+        src/em_state.c
+        src/em_dyn_array.c
+        src/private/em_ds_utils.h
+)
 
 target_include_directories(em_ds PUBLIC src include src/private)
 

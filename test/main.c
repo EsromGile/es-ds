@@ -2,14 +2,28 @@
 // Created by eli on 11/28/25.
 //
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include "em_dyn_array.h"
 #include "em_hash.h"
 #include "em_iterator.h"
 #include "em_slice.h"
+#include "em_state.h"
 #include "em_string.h"
 #include "em_string_builder.h"
+
+StateFunction start, end;
+void start(State *state) {
+    printf("start\n");
+    state->next = end;
+}
+void end(State *state) {
+    printf("end\n");
+    state->next = start;
+}
 
 int main(void) {
     // String *string = string_create("Hello World");
@@ -34,12 +48,31 @@ int main(void) {
     // string_destroy(str);
     // string_builder_destroy(builder);
 
-    HashTable *hash_table = hash_table_create(0, sizeof(uint32_t));
-    uint32_t value = 32;
-    hash_table_add(hash_table, &value);
-    bool x = hash_table_contains_value(hash_table, &value);
-    printf("Contains: %d\n", x);
+    // HashTable *hash_table = hash_table_create(0, sizeof(uint32_t));
+    // uint32_t value = 32;
+    // hash_table_add(hash_table, &value);
+    // bool x = hash_table_contains_value(hash_table, &value);
+    // printf("Contains: %d\n", x);
 
+    DynArray *array = dyn_array_create(16, sizeof (int));
+    for (int i = 0; i < 100; i++) {
+        dyn_array_push(array, &i);
+    }
+
+    for (int i = 0; i < 100; i++) {
+        int dest;
+        dyn_array_pop_into(array, &dest);
+        int *data = dyn_array_get_last(array);
+        printf("STATE:\n");
+        printf("  > Dest | Pointer: %p, Value: %d\n", &dest, dest);
+        if (data) printf("  > Last | Pointer: %p, Value: %d\n", data, *data);
+        else printf("  > Last | Pointer: NULL, Value: NULL");
+    }
+
+
+    // State state = state_make(start, NULL);
+    // state_next(&state);
+    // state_next(&state);
 
     // const Slice slice1 = slice_make(string_cstr(string), sizeof(char), 2, 3);
     // const char *s = slice_get(&slice1, 0);

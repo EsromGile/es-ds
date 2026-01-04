@@ -11,6 +11,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "em_ds_utils.h"
+
 #define HashValue uint8_t *
 #define SEED 0x00000000
 #define HASH_TABLE_INIT_CAPACITY 1024
@@ -26,12 +28,6 @@ typedef struct HashTable {
     uint32_t seed;
     HashValue entries[];
 } HashTable;
-
-// where num > 0
-bool is_power_of_two(const uint32_t num) {
-    const int x = (int) log2(num);
-    return pow(2, x) == num;
-}
 
 HashTable *hash_table_create(hash_key_t capacity, const size_t data_size) {
     if (capacity == 0) capacity = HASH_TABLE_INIT_CAPACITY;
